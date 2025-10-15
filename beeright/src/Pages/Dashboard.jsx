@@ -23,11 +23,12 @@ export default function Dashboard() {
   return (
     <div className="flex min-h-screen bg-[#f6f7f9] text-[#1f2937]">
       {/* Sidebar */}
-      <aside className="w-[220px] bg-white border-r border-[#ececec]">
+      <aside className="w-[220px] bg-[#f4b400] text-white">
         <div className="flex items-center gap-2 px-4 py-4">
-          <div className="text-2xl">🐝</div>
+          <img src="/logo.jpg" alt="BeeBright Logo" className="w-8 h-8 rounded-full" />
           <span className="font-extrabold">BeeBright</span>
         </div>
+
 
         <ul className="px-2 space-y-1">
           {navItems.map(([id, label, Icon]) => (
@@ -37,8 +38,11 @@ export default function Dashboard() {
               className={[
                 "flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition",
                 active === id
-                  ? "bg-[#fff7d4] shadow-[0_6px_16px_rgba(0,0,0,.07)]"
-                  : "hover:bg-[#f4f5f7]",
+                  ? "bg-white text-[#f4b400] font-bold"
+                  : "hover:bg-[#fff2a8]"
+
+
+
               ].join(" ")}
             >
               <Icon className="w-5 h-5 opacity-70" />
@@ -51,7 +55,7 @@ export default function Dashboard() {
       {/* Main */}
       <section className="flex-1 flex flex-col">
         {/* Top bar */}
-        <div className="h-16 bg-[#F4BE2C] border-b-[3px] border-[#e0a900] flex items-center justify-between px-5">
+        <div className="h-16 bg-[#f4b400] border-b-[3px] border-[#d4a100] flex items-center justify-between px-5">
           <div />
           <div className="flex items-center gap-4">
             <span className="text-2xl">🔔</span>
