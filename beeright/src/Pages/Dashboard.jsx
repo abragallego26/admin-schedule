@@ -23,7 +23,7 @@ export default function Dashboard() {
   return (
     <div className="flex min-h-screen bg-[#f6f7f9] text-[#1f2937]">
       {/* Sidebar */}
-      <aside className="w-[220px] bg-[#f4b400] text-white">
+      <aside className="w-[220px] bg-[#ffcc00] text-white">
         <div className="flex items-center gap-2 px-4 py-4">
           <img src="/logo.jpg" alt="BeeBright Logo" className="w-8 h-8 rounded-full" />
           <span className="font-extrabold">BeeBright</span>
@@ -38,8 +38,9 @@ export default function Dashboard() {
               className={[
                 "flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition",
                 active === id
-                  ? "bg-white text-[#f4b400] font-bold"
-                  : "hover:bg-[#fff2a8]"
+                  ? "bg-white text-[#f5b800] font-bold"
+                  : "hover:bg-[#ffeb99]"
+
 
 
 
@@ -55,8 +56,7 @@ export default function Dashboard() {
       {/* Main */}
       <section className="flex-1 flex flex-col">
         {/* Top bar */}
-        <div className="h-16 bg-[#f4b400] border-b-[3px] border-[#d4a100] flex items-center justify-between px-5">
-          <div />
+        <div className="h-16 bg-[#ffcc00] border-b-[3px] border-[#e5b700] shadow-md flex items-center justify-between px-5"><div />
           <div className="flex items-center gap-4">
             <span className="text-2xl">🔔</span>
             <div className="flex items-center gap-2 bg-white px-3 py-1 rounded-full shadow-[0_6px_16px_rgba(0,0,0,.07)]">
