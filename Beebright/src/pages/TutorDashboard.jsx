@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Card, { StatCard } from '../components/Card';
@@ -124,6 +124,149 @@ const TutorDashboard = ({ onLogout }) => {
       </div>
     </Card>
   );
+
+  
+
+  // ------------------ Student Records (frontend-only) ------------------
+  const StudentRecords = () => {
+    const STORAGE_KEY = 'beebright_records_v1';
+    const [records, setRecords] = useState(() => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    });
+
+    const [form, setForm] = useState({
+      name: '',
+      attendance: 'Present',
+      quiz: '',
+      exam: '',
+      participation: '',
+    });
+
+    useEffect(() => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    }, [records]);
+
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+      setForm({ ...form, [name]: value });
+    };
+
+    const handleAdd = (e) => {
+      e.preventDefault();
+      if (!form.name || form.quiz === '' || form.exam === '' || form.participation === '') {
+        alert('Please fill all fields');
+        return;
+      }
+      const avg = (Number(form.quiz) + Number(form.exam) + Number(form.participation)) / 3;
+      const newRec = {
+        id: Date.now(),
+        name: form.name,
+        attendance: form.attendance,
+        quiz: Number(form.quiz),
+        exam: Number(form.exam),
+        participation: Number(form.participation),
+        average: Number(avg.toFixed(2)),
+        date: new Date().toLocaleDateString(),
+      };
+      setRecords([newRec, ...records]);
+      setForm({ name: '', attendance: 'Present', quiz: '', exam: '', participation: '' });
+    };
+
+    // Suggested materials simple rules
+    const suggestionsFor = (avg) => {
+      if (avg < 50) return ['Start with basic drills', 'Watch intro video lessons', '1-on-1 tutoring'];
+      if (avg < 70) return ['Practice quizzes', 'Targeted exercises', 'Short video reviews'];
+      if (avg < 85) return ['Advanced practice', 'Timed mock tests'];
+      return ['Keep up the good work!'];
+    };
+
+    const lowest = records.length ? records.reduce((a,b) => a.average < b.average ? a : b) : null;
+
+    return (
+      <Card>
+        <h2 className="font-display font-bold text-2xl text-neutral-900 mb-4">Student Records</h2>
+
+        <form onSubmit={handleAdd} className="grid md:grid-cols-4 gap-3 mb-6">
+          <input name="name" value={form.name} onChange={handleChange} placeholder="Student name" className="border rounded-lg p-2" />
+          <select name="attendance" value={form.attendance} onChange={handleChange} className="border rounded-lg p-2">
+            <option>Present</option>
+            <option>Absent</option>
+          </select>
+          <input name="quiz" value={form.quiz} onChange={handleChange} type="number" placeholder="Quiz (0-100)" className="border rounded-lg p-2" />
+          <input name="exam" value={form.exam} onChange={handleChange} type="number" placeholder="Exam (0-100)" className="border rounded-lg p-2" />
+          <input name="participation" value={form.participation} onChange={handleChange} type="number" placeholder="Participation (0-100)" className="border rounded-lg p-2" />
+          <div className="md:col-span-4">
+            <button type="submit" className="bg-yellow-500 text-white py-2 px-4 rounded-lg">Add Record</button>
+          </div>
+        </form>
+
+        {records.length === 0 ? (
+          <p className="text-gray-500">No records yet. Add a student record above.</p>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="min-w-full border">
+                <thead>
+                  <tr className="bg-yellow-100 text-left">
+                    <th className="border p-2">Name</th>
+                    <th className="border p-2">Date</th>
+                    <th className="border p-2">Attendance</th>
+                    <th className="border p-2">Quiz</th>
+                    <th className="border p-2">Exam</th>
+                    <th className="border p-2">Participation</th>
+                    <th className="border p-2">Average</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {records.map((r) => (
+                    <tr key={r.id} className="hover:bg-gray-50">
+                      <td className="border p-2">{r.name}</td>
+                      <td className="border p-2">{r.date}</td>
+                      <td className="border p-2">{r.attendance}</td>
+                      <td className="border p-2">{r.quiz}</td>
+                      <td className="border p-2">{r.exam}</td>
+                      <td className="border p-2">{r.participation}</td>
+                      <td className="border p-2 font-semibold text-yellow-700">{r.average}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-6 grid md:grid-cols-2 gap-4">
+              <div className="p-4 border rounded-xl">
+                <h3 className="font-bold mb-2">Lowest-performing student</h3>
+                {lowest ? (
+                  <>
+                    <div className="mb-2">{lowest.name} — Avg: {lowest.average}</div>
+                    <div className="text-sm text-gray-600 mb-2">Suggested materials:</div>
+                    <ul className="list-disc pl-5">
+                      {suggestionsFor(lowest.average).map((sug, i) => <li key={i}>{sug}</li>)}
+                    </ul>
+                  </>
+                ) : (
+                  <p className="text-gray-500">No data</p>
+                )}
+              </div>
+
+              <div className="p-4 border rounded-xl">
+                <h3 className="font-bold mb-2">Quick actions</h3>
+                <p className="text-sm text-gray-600">You can later connect this to an AI service to generate more detailed study plans.</p>
+              </div>
+            </div>
+          </>
+        )}
+      </Card>
+    );
+  };
+
+
+
 
   const Classes = () => (
     <Card>
