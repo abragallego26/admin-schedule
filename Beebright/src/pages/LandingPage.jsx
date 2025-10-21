@@ -1,5 +1,6 @@
 import React from 'react';
 import Navbar from '../components/Navbar';
+import logo from '../assets/beebrightlogo.jpg';
 
 const LandingPage = ({ onLogin, onGoToLogin }) => {
   const features = [
@@ -51,7 +52,7 @@ const LandingPage = ({ onLogin, onGoToLogin }) => {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <div className="inline-block bg-amber-100 text-amber-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
-              ✨ Welcome to Bee Bright!
+              ✨ Welcome to BeeBright!
             </div>
             <h1 className="font-bold text-5xl md:text-6xl text-gray-900 mb-6 leading-tight">
               Learn Smarter,
@@ -122,7 +123,7 @@ const LandingPage = ({ onLogin, onGoToLogin }) => {
             <h2 className="font-bold text-4xl text-gray-900 mb-4">
               How to Get Started 🚀
             </h2>
-            <p className="text-xl text-gray-600">Simple steps to join Bee Bright</p>
+            <p className="text-xl text-gray-600">Simple steps to join BeeBright</p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
@@ -161,7 +162,7 @@ const LandingPage = ({ onLogin, onGoToLogin }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="font-bold text-4xl text-gray-900 mb-4">
-              Why Students Love Bee Bright 💛
+              Why Students Love BeeBright 💛
             </h2>
             <p className="text-xl text-gray-600">Everything you need to succeed, all in one place!</p>
           </div>
@@ -187,7 +188,7 @@ const LandingPage = ({ onLogin, onGoToLogin }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="font-bold text-4xl text-gray-900 mb-4">
-              About Bee Bright 🐝
+              About BeeBright
             </h2>
             <p className="text-xl text-gray-600">Your partner in academic excellence</p>
           </div>
@@ -220,7 +221,7 @@ const LandingPage = ({ onLogin, onGoToLogin }) => {
                 Our Mission
               </h3>
               <p className="text-lg text-gray-700 leading-relaxed">
-                At Bee Bright Tutorial Center, we believe every student has the potential to shine. 
+                At BeeBright Tutorial Center, we believe every student has the potential to shine. 
                 Our mission is to provide personalized, engaging, and effective tutoring that helps 
                 students not just improve their grades, but develop a genuine love for learning.
               </p>
@@ -465,7 +466,7 @@ const LandingPage = ({ onLogin, onGoToLogin }) => {
             Ready to Start Your Learning Journey?
           </h2>
           <p className="text-xl text-white opacity-90 mb-8">
-            Join hundreds of students already learning with Bee Bright!
+            Join hundreds of students already learning with BeeBright!
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <button
@@ -490,8 +491,8 @@ const LandingPage = ({ onLogin, onGoToLogin }) => {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <span className="text-4xl">🐝</span>
-                <span className="font-bold text-xl text-amber-400">Bee Bright</span>
+                <img src={logo} alt="BeeBright" className="w-8 h-8 object-contain" />
+                <span className="font-bold text-xl text-amber-400">BeeBright</span>
               </div>
               <p className="text-gray-400 text-sm">
                 Empowering students to reach their full potential through personalized tutoring.
@@ -533,7 +534,7 @@ const LandingPage = ({ onLogin, onGoToLogin }) => {
           </div>
 
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
-            <p>© 2025 Bee Bright Tutorial Center. All rights reserved.</p>
+            <p>© 2025 BeeBright Tutorial Center. All rights reserved.</p>
             <p className="mt-2">Made with ❤️ for students who want to shine bright!</p>
           </div>
         </div>

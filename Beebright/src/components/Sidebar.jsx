@@ -1,5 +1,6 @@
 import React from 'react';
 import { LogOut } from 'lucide-react';
+import logo from '../assets/beebrightlogo.jpg'; // adjust path if needed
 
 const Sidebar = ({ user, menuItems, activeTab, setActiveTab, onLogout }) => {
   // Safety check: Provide default values if user is undefined or missing properties
@@ -17,9 +18,9 @@ const Sidebar = ({ user, menuItems, activeTab, setActiveTab, onLogout }) => {
       {/* Logo & User Info */}
       <div className="p-6 border-b-2 border-neutral-100">
         <div className="flex items-center gap-3 mb-4">
-          <div className="text-4xl animate-float">🐝</div>
+          <img src={logo} alt="BeeBright" className="w-12 h-12 object-contain animate-float" />
           <span className="font-display font-bold text-2xl bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent">
-            Bee Bright
+            BeeBright
           </span>
         </div>
         <div className="bg-gradient-to-r from-primary-50 to-secondary-50 p-3 rounded-2xl">

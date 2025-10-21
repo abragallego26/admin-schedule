@@ -9,9 +9,9 @@ const Footer = () => {
           {/* Brand Section */}
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <div className="text-4xl animate-float">🐝</div>
+              <img src={logo} alt="BeeBright" className="w-12 h-12 object-contain animate-float" />
               <span className="font-display font-bold text-2xl bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent">
-                Bee Bright
+                BeeBright
               </span>
             </div>
             <p className="text-neutral-400 mb-4">
@@ -127,10 +127,10 @@ const Footer = () => {
         <div className="border-t border-neutral-700 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-neutral-400 text-sm">
-              © 2025 Bee Bright Tutorial Center. All rights reserved.
+              © 2025 BeeBright Tutorial Center. All rights reserved.
             </p>
             <p className="text-neutral-400 text-sm flex items-center gap-1">
-              Made with <Heart size={16} className="text-red-500 fill-red-500" /> by the Bee Bright Team
+              Made with <Heart size={16} className="text-red-500 fill-red-500" /> by the BeeBright Team
             </p>
           </div>
         </div>

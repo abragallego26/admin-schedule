@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import logo from '../assets/beebrightlogo.jpg';
 import { useAuth } from '../context/AuthContext';
 import { Eye, EyeOff, Mail, Lock, ArrowLeft } from 'lucide-react';
 

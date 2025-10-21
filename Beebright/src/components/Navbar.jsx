@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import logo from '../assets/beebrightlogo.jpg';
 
 const Navbar = ({ onGetStarted, onLogin }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -9,9 +10,9 @@ const Navbar = ({ onGetStarted, onLogin }) => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <span className="text-4xl">🐝</span>
+            <img src={logo} alt="BeeBright" className="w-8 h-8 object-contain" />
             <span className="font-bold text-2xl bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
-              Bee Bright
+              BeeBright
             </span>
           </div>
 
