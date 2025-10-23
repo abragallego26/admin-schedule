@@ -2,14 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import Card, { StatCard } from '../components/Card';
-import { Home, Users, Calendar, FileText, Clock, ChevronRight } from 'lucide-react';
+import { Home, Users, Calendar, FileText, Clock, ChevronRight, Brain } from 'lucide-react';
 
 const TutorDashboard = ({ onLogout }) => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
+  const [aiQuery, setAiQuery] = useState('');
+  const [aiResponse, setAiResponse] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const menuItems = [
     { id: 'home', icon: Home, label: 'Dashboard', color: 'text-primary-500' },
+    { id: 'ai', icon: Brain, label: 'AI Assistant', color: 'text-purple-500', badge: 'NEW' },
     { id: 'classes', icon: Calendar, label: 'My Classes', color: 'text-blue-500' },
     { id: 'students', icon: Users, label: 'My Students', color: 'text-green-500' },
     { id: 'reports', icon: FileText, label: 'Reports', color: 'text-purple-500' }
@@ -29,6 +33,236 @@ const TutorDashboard = ({ onLogout }) => {
     { id: 5, name: "Ethan Cruz", grade: "Grade 6", avatar: "👦", score: 91, attendance: 97 },
     { id: 6, name: "Mia Santos", grade: "Grade 4", avatar: "👧", score: 86, attendance: 95 }
   ];
+
+  const aiFeatures = [
+    {
+      title: "Lesson Planning",
+      description: "Create engaging lesson plans and activities",
+      icon: "📝",
+      color: "from-blue-500 to-cyan-500",
+      prompt: "Help me create a lesson plan for teaching fractions"
+    },
+    {
+      title: "Assessment Builder",
+      description: "Generate quizzes and test questions",
+      icon: "📊",
+      color: "from-purple-500 to-pink-500",
+      prompt: "Create a quiz for 5th grade math about decimals"
+    },
+    {
+      title: "Student Support",
+      description: "Get strategies for struggling students",
+      icon: "👥",
+      color: "from-green-500 to-teal-500",
+      prompt: "What are effective strategies for students struggling with algebra?"
+    },
+    {
+      title: "Parent Communication",
+      description: "Draft progress reports and parent emails",
+      icon: "💬",
+      color: "from-orange-500 to-red-500",
+      prompt: "Help me write a progress report for a student"
+    }
+  ];
+
+  const recentConversations = [
+    { question: "How can I make geometry more engaging?", time: "1 day ago" },
+    { question: "Differentiated instruction strategies", time: "2 days ago" },
+    { question: "Classroom management techniques", time: "3 days ago" }
+  ];
+
+  const handleAiSubmit = (e) => {
+    e.preventDefault();
+    if (!aiQuery.trim()) return;
+    
+    setIsLoading(true);
+    // Simulate AI response
+    setTimeout(() => {
+      setAiResponse(`I'd be happy to help with your teaching question about "${aiQuery}"! Here are some professional insights:
+
+🎯 **Teaching Strategies:**
+• Differentiated instruction approaches
+• Hands-on learning activities
+• Assessment techniques
+
+📚 **Resource Recommendations:**
+• Lesson materials and tools
+• Professional development resources
+• Classroom management tips
+
+💡 **Best Practices:**
+• Evidence-based teaching methods
+• Student engagement techniques
+• Progress monitoring approaches
+
+Would you like me to elaborate on any specific aspect or provide more detailed resources?`);
+      setIsLoading(false);
+    }, 2000);
+  };
+
+  const handleQuickPrompt = (prompt) => {
+    setAiQuery(prompt);
+  };
+
+  const TutorAI = () => (
+    <div className="space-y-6">
+      {/* AI Header */}
+      <div className="text-center mb-8">
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <span className="text-6xl animate-pulse">🤖</span>
+          <h1 className="text-4xl md:text-5xl font-black text-gray-800">
+            Your Teaching <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">AI Assistant</span>
+          </h1>
+        </div>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          Get expert help with lesson planning, student support, and teaching strategies. Powered by AI to enhance your teaching! ✨
+        </p>
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* AI Features */}
+        <div className="lg:col-span-2">
+          <Card>
+            <h2 className="text-2xl font-black text-gray-800 mb-4 flex items-center gap-3">
+              <span className="text-3xl">🚀</span> Teaching Assistant Features
+            </h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              {aiFeatures.map((feature, idx) => (
+                <div 
+                  key={idx}
+                  className={`bg-gradient-to-br ${feature.color} rounded-2xl p-4 text-white transform hover:scale-105 transition-all duration-200 cursor-pointer shadow-lg`}
+                  onClick={() => handleQuickPrompt(feature.prompt)}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-3xl">{feature.icon}</span>
+                    <h3 className="font-bold text-lg">{feature.title}</h3>
+                  </div>
+                  <p className="text-white/90 text-sm">{feature.description}</p>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* AI Chat Interface */}
+          <Card>
+            <h2 className="text-2xl font-black text-gray-800 mb-4 flex items-center gap-3">
+              <span className="text-3xl">💬</span> Ask Your Teaching Assistant
+            </h2>
+            <form onSubmit={handleAiSubmit} className="space-y-4">
+              <div className="relative">
+                <textarea
+                  value={aiQuery}
+                  onChange={(e) => setAiQuery(e.target.value)}
+                  placeholder="Ask about lesson planning, teaching strategies, classroom management, or any teaching-related topic... 🌟"
+                  className="w-full h-32 p-4 border-4 border-purple-200 rounded-2xl resize-none focus:outline-none focus:border-purple-400 transition-colors text-lg"
+                  disabled={isLoading}
+                />
+                <div className="absolute bottom-3 right-3 text-gray-400">
+                  {aiQuery.length}/500
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={isLoading || !aiQuery.trim()}
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-2xl font-bold text-lg hover:shadow-xl transform hover:scale-105 transition-all disabled:opacity-50 disabled:transform-none disabled:hover:shadow-none"
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Thinking...
+                  </div>
+                ) : (
+                  'Get Teaching Help! 🎯'
+                )}
+              </button>
+            </form>
+
+            {aiResponse && (
+              <div className="mt-6 p-4 bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl border-4 border-green-200">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-2xl">🤖</span>
+                  <h3 className="font-bold text-gray-800">AI Teaching Assistant:</h3>
+                </div>
+                <div className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                  {aiResponse}
+                </div>
+                <div className="flex gap-2 mt-4">
+                  <button className="bg-white px-4 py-2 rounded-full font-semibold text-sm border-2 border-purple-200 hover:border-purple-400 transition-colors">
+                    👍 Helpful
+                  </button>
+                  <button className="bg-white px-4 py-2 rounded-full font-semibold text-sm border-2 border-purple-200 hover:border-purple-400 transition-colors">
+                    🔄 Regenerate
+                  </button>
+                  <button className="bg-white px-4 py-2 rounded-full font-semibold text-sm border-2 border-purple-200 hover:border-purple-400 transition-colors">
+                    📋 Copy
+                  </button>
+                </div>
+              </div>
+            )}
+          </Card>
+        </div>
+
+        {/* Sidebar - Recent & Tips */}
+        <div className="space-y-6">
+          {/* Recent Conversations */}
+          <Card>
+            <h2 className="text-2xl font-black text-gray-800 mb-4 flex items-center gap-3">
+              <span className="text-3xl">🕒</span> Recent Conversations
+            </h2>
+            <div className="space-y-3">
+              {recentConversations.map((conv, idx) => (
+                <div 
+                  key={idx}
+                  className="p-3 bg-gray-50 rounded-xl border-2 border-gray-200 hover:border-purple-300 transition-colors cursor-pointer"
+                  onClick={() => setAiQuery(conv.question)}
+                >
+                  <p className="font-semibold text-gray-800 text-sm mb-1 line-clamp-2">
+                    {conv.question}
+                  </p>
+                  <p className="text-xs text-gray-500">{conv.time}</p>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Teaching Tips */}
+          <div className="bg-gradient-to-br from-orange-100 to-pink-100 rounded-3xl p-6 shadow-xl border-4 border-orange-200">
+            <h2 className="text-2xl font-black text-gray-800 mb-4 flex items-center gap-3">
+              <span className="text-3xl">💫</span> Pro Teaching Tips
+            </h2>
+            <div className="space-y-3">
+              {[
+                "Use specific examples when asking about student challenges",
+                "Request differentiated instruction strategies",
+                "Ask for age-appropriate activity ideas",
+                "Get help with assessment design"
+              ].map((tip, idx) => (
+                <div key={idx} className="flex items-start gap-2">
+                  <span className="text-lg">✨</span>
+                  <p className="text-gray-700 text-sm">{tip}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Quick Resources */}
+          <div className="bg-gradient-to-br from-purple-100 to-blue-100 rounded-3xl p-6 shadow-xl border-4 border-purple-200">
+            <h2 className="text-2xl font-black text-gray-800 mb-4 flex items-center gap-3">
+              <span className="text-3xl">🌠</span> Teaching Resources
+            </h2>
+            <div className="text-gray-700 space-y-2">
+              <p className="text-sm">
+                <strong>Quick Tip:</strong> The AI can help you create rubrics, lesson plans, and parent communications!
+              </p>
+              <p className="text-sm">
+                <strong>Try:</strong> "Create a rubric for science projects" or "Help me write a newsletter for parents"
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   const TutorHome = () => (
     <div className="space-y-6">
@@ -124,8 +358,6 @@ const TutorDashboard = ({ onLogout }) => {
       </div>
     </Card>
   );
-
-  
 
   // ------------------ Student Records (frontend-only) ------------------
   const StudentRecords = () => {
@@ -265,9 +497,6 @@ const TutorDashboard = ({ onLogout }) => {
     );
   };
 
-
-
-
   const Classes = () => (
     <Card>
       <h2 className="font-display font-bold text-2xl text-neutral-900 mb-6">Weekly Schedule 📅</h2>
@@ -338,6 +567,7 @@ const TutorDashboard = ({ onLogout }) => {
       />
       <div className="ml-64 p-8">
         {activeTab === 'home' && <TutorHome />}
+        {activeTab === 'ai' && <TutorAI />}
         {activeTab === 'classes' && <Classes />}
         {activeTab === 'students' && <Students />}
         {activeTab === 'reports' && <Reports />}
