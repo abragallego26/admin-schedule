@@ -255,46 +255,6 @@ const EnrollmentForm = ({ onBack, enrollmentType }) => {
             </p>
           </div>
 
-          {/* Schedule & Notes */}
-          <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl border-4 border-orange-200">
-            <h2 className="text-2xl font-black text-gray-900 mb-6 flex items-center gap-2">
-              <span className="text-3xl">📅</span>
-              Additional Information
-            </h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-gray-700 font-bold mb-2">
-                  Preferred Schedule
-                </label>
-                <select
-                  name="schedule"
-                  value={formData.schedule}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-amber-500 focus:outline-none"
-                >
-                  <option value="">Select preferred time</option>
-                  <option value="Weekday Mornings">Weekday Mornings</option>
-                  <option value="Weekday Afternoons">Weekday Afternoons</option>
-                  <option value="Weekday Evenings">Weekday Evenings</option>
-                  <option value="Weekends">Weekends</option>
-                  <option value="Flexible">Flexible</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-gray-700 font-bold mb-2">
-                  Additional Notes
-                </label>
-                <textarea
-                  name="notes"
-                  value={formData.notes}
-                  onChange={handleChange}
-                  rows="4"
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-amber-500 focus:outline-none"
-                  placeholder="Any special requests or concerns? (Optional)"
-                />
-              </div>
-            </div>
-          </div>
 
           {/* Submit Button */}
           <div className="bg-gradient-to-r from-green-400 to-blue-500 rounded-3xl p-8 text-center shadow-xl">

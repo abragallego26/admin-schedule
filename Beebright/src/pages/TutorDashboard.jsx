@@ -18,6 +18,7 @@ const TutorDashboard = ({ onLogout }) => {
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [selectedSubject, setSelectedSubject] = useState('');
 
   const menuItems = [
     { id: 'home', icon: Home, label: 'Dashboard', color: 'text-primary-500' },
@@ -43,10 +44,13 @@ const TutorDashboard = ({ onLogout }) => {
   ];
 
   // Quick Actions Handlers
-  const handleMarkAttendance = () => {
-  setSelectedClass({ subject: "All Students" });
-  setShowAttendanceModal(true);
-};
+  const handleMarkAttendance = (cls) => {
+    // If a class object is provided, use its subject; otherwise fall back to selectedSubject or All Students
+    const subject = cls?.subject ?? selectedSubject ?? 'All Students';
+    setSelectedClass(cls ?? { subject });
+    setSelectedSubject(subject);
+    setShowAttendanceModal(true);
+  };
 
   const handleEnterGrades = () => {
     setShowGradesModal(true);
@@ -65,10 +69,10 @@ const TutorDashboard = ({ onLogout }) => {
     const [attendance, setAttendance] = useState({});
     
     useEffect(() => {
-      // Initialize attendance status for each student
+      // Initialize attendance status for each student as unmarked (empty) so buttons start gray
       const initialAttendance = {};
       myStudents.forEach(student => {
-        initialAttendance[student.id] = 'Present';
+        initialAttendance[student.id] = '';
       });
       setAttendance(initialAttendance);
     }, []);
@@ -81,9 +85,32 @@ const TutorDashboard = ({ onLogout }) => {
     };
 
     const handleSubmitAttendance = () => {
-      // In a real app, this would send data to your backend
-      console.log('Attendance submitted:', attendance);
-      alert(`Attendance marked for All Students!`);
+      // Persist attendance into the shared student records storage
+      const STORAGE_KEY = 'beebright_records_v1';
+      const subject = selectedSubject || (selectedClass && selectedClass.subject) || '';
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const records = raw ? JSON.parse(raw) : [];
+        const date = new Date().toLocaleDateString();
+        const newRecs = myStudents.map(student => ({
+          id: Date.now() + student.id,
+          name: student.name,
+          attendance: attendance[student.id] || '',
+          quiz: '',
+          exam: '',
+          participation: '',
+          average: 0,
+          date,
+          subject,
+          assignmentType: 'Attendance'
+        }));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify([...newRecs, ...records]));
+        console.log('Attendance saved to records:', newRecs);
+        alert(`Attendance marked for ${subject || 'All Students'} and saved to Student Records.`);
+      } catch (err) {
+        console.error(err);
+        alert('Failed to save attendance locally.');
+      }
       setShowAttendanceModal(false);
     };
 
@@ -92,46 +119,59 @@ const TutorDashboard = ({ onLogout }) => {
         <div className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-gray-800">
-                Mark Attendance - All Students
+              Mark Attendance - {selectedSubject || (selectedClass && selectedClass.subject) || 'All Students'}
             </h2>
             <button onClick={() => setShowAttendanceModal(false)} className="text-gray-500 hover:text-gray-700">
               <X size={24} />
             </button>
           </div>
-          
-          <div className="space-y-4">
-            {myStudents.map(student => (
-              <div key={student.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">{student.avatar}</span>
-                  <div>
-                    <div className="font-semibold">{student.name}</div>
-                    <div className="text-sm text-gray-600">{student.grade}</div>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  {['Present', 'Absent', 'Late'].map(status => (
-                    <button
-                      key={status}
-                      onClick={() => handleAttendanceChange(student.id, status)}
-                      className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                        attendance[student.id] === status
-                          ? status === 'Present' 
-                            ? 'bg-green-500 text-white'
-                            : status === 'Absent'
-                            ? 'bg-red-500 text-white'
-                            : 'bg-yellow-500 text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                      }`}
-                    >
-                      {status}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
+
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b-2 border-neutral-200">
+                  <th className="text-left py-3 px-4 font-bold text-neutral-700">Student</th>
+                  <th className="text-left py-3 px-4 font-bold text-neutral-700">Grade</th>
+                  <th className="text-left py-3 px-4 font-bold text-neutral-700">Attendance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {myStudents.map(student => (
+                  <tr key={student.id} className="border-b border-neutral-100 hover:bg-neutral-50">
+                    <td className="py-3 px-4 flex items-center gap-3">
+                      <span className="text-2xl">{student.avatar}</span>
+                      <div>
+                        <div className="font-semibold">{student.name}</div>
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 text-neutral-600">{student.grade}</td>
+                    <td className="py-3 px-4">
+                      <div className="flex gap-2">
+                        {['Present', 'Absent', 'Late'].map(status => (
+                          <button
+                            key={status}
+                            onClick={() => handleAttendanceChange(student.id, status)}
+                            className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                              attendance[student.id] === status
+                                ? status === 'Present' 
+                                  ? 'bg-green-500 text-white'
+                                  : status === 'Absent'
+                                  ? 'bg-red-500 text-white'
+                                  : 'bg-yellow-500 text-white'
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                            }`}
+                          >
+                            {status}
+                          </button>
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          
+
           <div className="flex gap-3 mt-6">
             <button
               onClick={handleSubmitAttendance}
@@ -154,7 +194,7 @@ const TutorDashboard = ({ onLogout }) => {
   // Grades Modal Component
   const GradesModal = () => {
     const [grades, setGrades] = useState({});
-    const [assignmentType, setAssignmentType] = useState('Quiz');
+  const [assignmentType, setAssignmentType] = useState('Quiz 1');
 
     const handleGradeChange = (studentId, value) => {
       setGrades(prev => ({
@@ -164,8 +204,39 @@ const TutorDashboard = ({ onLogout }) => {
     };
 
     const handleSubmitGrades = () => {
-      console.log('Grades submitted:', grades);
-      alert(`Grades for ${assignmentType} saved successfully!`);
+      // Persist grades into the shared student records storage
+      const STORAGE_KEY = 'beebright_records_v1';
+      const subject = selectedSubject || (selectedClass && selectedClass.subject) || '';
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const records = raw ? JSON.parse(raw) : [];
+        const date = new Date().toLocaleDateString();
+        const newRecs = myStudents.map(student => {
+          const quiz = grades[student.id] && grades[student.id].quiz !== undefined ? Number(grades[student.id].quiz) : '';
+          const exam = grades[student.id] && grades[student.id].exam !== undefined ? Number(grades[student.id].exam) : '';
+          const participation = grades[student.id] && grades[student.id].participation !== undefined ? Number(grades[student.id].participation) : '';
+          const avgVals = [quiz, exam, participation].filter(v => v !== '');
+          const average = avgVals.length ? Number((avgVals.reduce((a,b) => a + b, 0) / avgVals.length).toFixed(2)) : 0;
+          return {
+            id: Date.now() + student.id,
+            name: student.name,
+            attendance: '',
+            quiz: quiz || '',
+            exam: exam || '',
+            participation: participation || '',
+            average,
+            date,
+            subject,
+            assignmentType
+          };
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify([...newRecs, ...records]));
+        console.log('Grades saved to records:', newRecs);
+        alert(`Grades for ${assignmentType} (${subject || 'All Subjects'}) saved to Student Records.`);
+      } catch (err) {
+        console.error(err);
+        alert('Failed to save grades locally.');
+      }
       setShowGradesModal(false);
     };
 
@@ -173,7 +244,7 @@ const TutorDashboard = ({ onLogout }) => {
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-2xl p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">Enter Grades</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Enter Grades - {selectedSubject || 'All Subjects'}</h2>
             <button onClick={() => setShowGradesModal(false)} className="text-gray-500 hover:text-gray-700">
               <X size={24} />
             </button>
@@ -186,11 +257,15 @@ const TutorDashboard = ({ onLogout }) => {
               onChange={(e) => setAssignmentType(e.target.value)}
               className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option>Quiz</option>
-              <option>Homework</option>
-              <option>Test</option>
-              <option>Project</option>
-              <option>Participation</option>
+              <option>Quiz 1</option>
+              <option>Quiz 2</option>
+              <option>Quiz 3</option>
+              <option>Homework 1</option>
+              <option>Homework 2</option>
+              <option>Homework 3</option>
+              <option>Test 1</option>
+              <option>Test 2</option>
+              <option>Test 3</option>
             </select>
           </div>
 
@@ -397,36 +472,21 @@ const TutorDashboard = ({ onLogout }) => {
   // Message Parents Modal Component
   const MessageParentsModal = () => {
     const [message, setMessage] = useState('');
-    const [selectedStudents, setSelectedStudents] = useState([]);
+    // Default to all students selected — the modal no longer shows per-student selection UI
+    const [selectedStudents] = useState(myStudents.map(student => student.id));
     const [messageType, setMessageType] = useState('Progress Update');
 
-    const toggleStudentSelection = (studentId) => {
-      setSelectedStudents(prev =>
-        prev.includes(studentId)
-          ? prev.filter(id => id !== studentId)
-          : [...prev, studentId]
-      );
-    };
-
-    const selectAllStudents = () => {
-      setSelectedStudents(myStudents.map(student => student.id));
-    };
-
     const handleSendMessage = () => {
-      if (selectedStudents.length === 0 || !message.trim()) {
-        alert('Please select at least one student and write a message');
+      if (!message.trim()) {
+        alert('Please write a message');
         return;
       }
 
-      const selectedNames = myStudents
-        .filter(student => selectedStudents.includes(student.id))
-        .map(student => student.name)
-        .join(', ');
-
+      // Send to all students' parents
+      const selectedNames = myStudents.map(s => s.name).join(', ');
       alert(`Message sent to parents of: ${selectedNames}`);
       setShowMessageModal(false);
       setMessage('');
-      setSelectedStudents([]);
     };
 
     return (
@@ -455,38 +515,7 @@ const TutorDashboard = ({ onLogout }) => {
           </div>
 
           <div className="mb-6">
-            <div className="flex justify-between items-center mb-3">
-              <label className="block text-sm font-medium text-gray-700">Select Students</label>
-              <button
-                type="button"
-                onClick={selectAllStudents}
-                className="text-sm text-orange-600 hover:text-orange-700 font-medium"
-              >
-                Select All
-              </button>
-            </div>
-            <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
-              {myStudents.map(student => (
-                <div
-                  key={student.id}
-                  className={`flex items-center gap-2 p-3 border rounded-lg cursor-pointer transition ${
-                    selectedStudents.includes(student.id)
-                      ? 'bg-orange-50 border-orange-200'
-                      : 'bg-white border-gray-200 hover:bg-gray-50'
-                  }`}
-                  onClick={() => toggleStudentSelection(student.id)}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedStudents.includes(student.id)}
-                    onChange={() => {}}
-                    className="rounded text-orange-600 focus:ring-orange-500"
-                  />
-                  <span className="text-xl">{student.avatar}</span>
-                  <span className="font-medium text-sm">{student.name}</span>
-                </div>
-              ))}
-            </div>
+            <p className="text-sm text-gray-600">This message will be sent to all students' parents.</p>
           </div>
 
           <div className="mb-6">
@@ -795,9 +824,22 @@ Would you like me to elaborate on any specific aspect or provide more detailed r
 
       <Card>
         <h2 className="font-display font-bold text-2xl text-neutral-900 mb-4">Quick Actions</h2>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-neutral-700 mb-2">Select Subject</label>
+          <select
+            value={selectedSubject}
+            onChange={(e) => setSelectedSubject(e.target.value)}
+            className="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 mb-3"
+          >
+            <option value="">-- All Subjects / Select Subject --</option>
+            {Array.from(new Set(todayClasses.map(c => c.subject))).map((sub, i) => (
+              <option key={i} value={sub}>{sub}</option>
+            ))}
+          </select>
+        </div>
         <div className="grid md:grid-cols-2 gap-4">
           <button 
-            onClick={() => handleMarkAttendance(todayClasses[0])}
+            onClick={() => handleMarkAttendance()}
             className="p-4 rounded-xl bg-gradient-to-r from-green-50 to-green-100 border-2 border-green-200 hover:shadow-md transition text-left hover:border-green-400"
           >
             <div className="text-3xl mb-2">📝</div>
@@ -960,20 +1002,24 @@ Would you like me to elaborate on any specific aspect or provide more detailed r
               <table className="min-w-full border">
                 <thead>
                   <tr className="bg-yellow-100 text-left">
-                    <th className="border p-2">Name</th>
-                    <th className="border p-2">Date</th>
-                    <th className="border p-2">Attendance</th>
-                    <th className="border p-2">Quiz</th>
-                    <th className="border p-2">Exam</th>
-                    <th className="border p-2">Participation</th>
-                    <th className="border p-2">Average</th>
-                  </tr>
+                      <th className="border p-2">Name</th>
+                      <th className="border p-2">Date</th>
+                      <th className="border p-2">Subject</th>
+                      <th className="border p-2">Assignment</th>
+                      <th className="border p-2">Attendance</th>
+                      <th className="border p-2">Quiz</th>
+                      <th className="border p-2">Exam</th>
+                      <th className="border p-2">Participation</th>
+                      <th className="border p-2">Average</th>
+                    </tr>
                 </thead>
                 <tbody>
                   {records.map((r) => (
                     <tr key={r.id} className="hover:bg-gray-50">
                       <td className="border p-2">{r.name}</td>
                       <td className="border p-2">{r.date}</td>
+                      <td className="border p-2">{r.subject || '-'}</td>
+                      <td className="border p-2">{r.assignmentType || '-'}</td>
                       <td className="border p-2">{r.attendance}</td>
                       <td className="border p-2">{r.quiz}</td>
                       <td className="border p-2">{r.exam}</td>

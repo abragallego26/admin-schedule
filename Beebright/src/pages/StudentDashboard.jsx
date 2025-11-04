@@ -10,6 +10,8 @@ const Sidebar = ({ activeTab, onTabChange, onLogout, student }) => {
     ...student
   };
 
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
   const studentMenuItems = [
     {
       id: 'overview',
@@ -142,17 +144,42 @@ const Sidebar = ({ activeTab, onTabChange, onLogout, student }) => {
           </div>
         </div>
 
-        {/* Logout Button */}
-        <button
-          onClick={onLogout}
-          className="w-full flex items-center gap-3 p-3 rounded-xl text-red-600 hover:bg-red-50 transition-all duration-200 font-semibold border-2 border-transparent hover:border-red-200 hover:shadow-sm group"
-        >
-          <LogOut 
-            size={20} 
-            className="group-hover:scale-110 transition-transform duration-200" 
-          />
-          <span>Logout</span>
-        </button>
+        {/* Logout Button (opens confirmation modal) */}
+        <>
+          <button
+            onClick={() => setShowLogoutModal(true)}
+            className="w-full flex items-center gap-3 p-3 rounded-xl text-red-600 hover:bg-red-50 transition-all duration-200 font-semibold border-2 border-transparent hover:border-red-200 hover:shadow-sm group"
+          >
+            <LogOut 
+              size={20} 
+              className="group-hover:scale-110 transition-transform duration-200" 
+            />
+            <span>Logout</span>
+          </button>
+
+          {showLogoutModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+                <h3 className="text-xl font-bold text-neutral-900 mb-3 text-center">Confirm Logout</h3>
+                <p className="text-center text-neutral-600 mb-6">Are you sure you want to log out?</p>
+                <div className="flex gap-3 justify-center">
+                  <button
+                    onClick={() => { setShowLogoutModal(false); onLogout(); }}
+                    className="bg-red-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-600"
+                  >
+                    Yes, Logout
+                  </button>
+                  <button
+                    onClick={() => setShowLogoutModal(false)}
+                    className="bg-neutral-200 text-neutral-800 px-6 py-2 rounded-lg font-semibold hover:bg-neutral-300"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       </div>
     </div>
   );

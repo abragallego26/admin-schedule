@@ -42,19 +42,19 @@ const ParentDashboard = ({ onLogout }) => {
 
       <Card>
         <h2 className="font-display font-bold text-2xl text-neutral-900 mb-4">Select Child</h2>
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="flex gap-4 overflow-x-auto pb-2">
           {children.map((child) => (
             <button
               key={child.id}
               onClick={() => setSelectedChild(child)}
-              className={`p-4 rounded-xl border-2 transition ${
+              className={`min-w-[220px] text-left p-4 rounded-xl border-2 transition flex-shrink-0 ${
                 selectedChild.id === child.id
-                  ? 'border-primary-500 bg-primary-50'
-                  : 'border-neutral-200 hover:border-primary-300'
+                  ? 'border-yellow-300 bg-yellow-50'
+                  : 'border-neutral-200 hover:border-primary-300 bg-white'
               }`}
             >
               <div className="flex items-center gap-3">
-                <div className="text-4xl">{child.avatar}</div>
+                <div className="text-3xl">{child.avatar}</div>
                 <div className="text-left">
                   <div className="font-bold text-neutral-900">{child.name}</div>
                   <div className="text-sm text-neutral-600">{child.grade}</div>
