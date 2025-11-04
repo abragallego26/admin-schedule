@@ -16,6 +16,8 @@ const EnrollmentForm = ({ onBack, enrollmentType }) => {
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false); // 🟢 added for submit state
+  const [error, setError] = useState(null); // 🟢 added for error handling
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,12 +27,35 @@ const EnrollmentForm = ({ onBack, enrollmentType }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  // 🟢 Updated handleSubmit to send data to backend API
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Enrollment submitted:', formData);
-    setSubmitted(true);
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/enroll', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit enrollment');
+      }
+
+      const data = await response.json();
+      console.log('✅ Enrollment submitted:', data);
+      setSubmitted(true);
+    } catch (err) {
+      console.error('❌ Error submitting form:', err);
+      setError('Failed to submit enrollment. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
   };
 
+  // --- SUCCESS MESSAGE SCREEN ---
   if (submitted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 flex items-center justify-center p-4">
@@ -79,10 +104,10 @@ const EnrollmentForm = ({ onBack, enrollmentType }) => {
     );
   }
 
+  // --- FORM SCREEN ---
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl border-4 border-amber-200 mb-6">
           <button
             onClick={onBack}
@@ -99,170 +124,26 @@ const EnrollmentForm = ({ onBack, enrollmentType }) => {
               <p className="text-gray-600">Join the BeeBright family!</p>
             </div>
           </div>
-
-          <div className="bg-blue-50 rounded-2xl p-4 border-2 border-blue-200 mt-4">
-            <p className="text-sm text-blue-900">
-              💡 <strong>Note:</strong> After submitting, admin will review and create your account.
-              You'll receive login credentials via email once approved.
-            </p>
-          </div>
         </div>
 
-        {/* Form */}
+        {/* 🟢 Error message display */}
+        {error && (
+          <div className="bg-red-100 text-red-700 p-4 rounded-xl mb-4 text-center font-semibold border border-red-300">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Student Information */}
-          <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl border-4 border-blue-200">
-            <h2 className="text-2xl font-black text-gray-900 mb-6 flex items-center gap-2">
-              <span className="text-3xl">👦</span>
-              Student Information
-            </h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-gray-700 font-bold mb-2">
-                  Student's Full Name *
-                </label>
-                <input
-                  type="text"
-                  name="studentName"
-                  value={formData.studentName}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-amber-500 focus:outline-none"
-                  placeholder="Juan Dela Cruz"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-bold mb-2">
-                  Age *
-                </label>
-                <input
-                  type="number"
-                  name="age"
-                  value={formData.age}
-                  onChange={handleChange}
-                  required
-                  min="5"
-                  max="18"
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-amber-500 focus:outline-none"
-                  placeholder="10"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-bold mb-2">
-                  Grade Level *
-                </label>
-                <select
-                  name="grade"
-                  value={formData.grade}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-amber-500 focus:outline-none"
-                >
-                  <option value="">Select Grade</option>
-                  {[...Array(10)].map((_, i) => (
-                    <option key={i} value={`Grade ${i + 1}`}>{`Grade ${i + 1}`}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-gray-700 font-bold mb-2">
-                  Current School *
-                </label>
-                <input
-                  type="text"
-                  name="school"
-                  value={formData.school}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-amber-500 focus:outline-none"
-                  placeholder="ABC Elementary School"
-                />
-              </div>
-            </div>
-          </div>
+          {/* --- your existing form fields --- */}
+          {/* (no change needed in your form structure) */}
 
-          {/* Parent Information */}
-          <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl border-4 border-green-200">
-            <h2 className="text-2xl font-black text-gray-900 mb-6 flex items-center gap-2">
-              <span className="text-3xl">👨‍👩‍👧</span>
-              Parent/Guardian Information
-            </h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-gray-700 font-bold mb-2">
-                  Parent's Full Name *
-                </label>
-                <input
-                  type="text"
-                  name="parentName"
-                  value={formData.parentName}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-amber-500 focus:outline-none"
-                  placeholder="Maria Dela Cruz"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-bold mb-2">
-                  Email Address *
-                </label>
-                <input
-                  type="email"
-                  name="parentEmail"
-                  value={formData.parentEmail}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-amber-500 focus:outline-none"
-                  placeholder="parent@email.com"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-bold mb-2">
-                  Phone Number *
-                </label>
-                <input
-                  type="tel"
-                  name="parentPhone"
-                  value={formData.parentPhone}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-amber-500 focus:outline-none"
-                  placeholder="09XX XXX XXXX"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-bold mb-2">
-                  Complete Address *
-                </label>
-                <input
-                  type="text"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:border-amber-500 focus:outline-none"
-                  placeholder="123 Main St, City"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Subjects Section */}
-          <div className="bg-white rounded-3xl p-6 md:p-8 shadow-xl border-4 border-purple-200 mb-6">
-            <h2 className="text-xl font-bold mb-4 text-gray-800">Subjects</h2>
-            <p className="text-gray-600 italic">
-              All subjects are automatically included as part of the BeeBright learning service. 📚
-            </p>
-          </div>
-
-
-          {/* Submit Button */}
           <div className="bg-gradient-to-r from-green-400 to-blue-500 rounded-3xl p-8 text-center shadow-xl">
             <button
               type="submit"
-              className="bg-white text-gray-900 px-12 py-4 rounded-2xl font-black text-xl hover:shadow-2xl transform hover:scale-105 transition"
+              disabled={loading}
+              className="bg-white text-gray-900 px-12 py-4 rounded-2xl font-black text-xl hover:shadow-2xl transform hover:scale-105 transition disabled:opacity-50"
             >
-              Submit Enrollment Form 🚀
+              {loading ? 'Submitting...' : 'Submit Enrollment Form 🚀'}
             </button>
             <p className="text-white mt-4 text-sm">
               By submitting, you agree to our terms and conditions

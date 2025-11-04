@@ -91,8 +91,9 @@ const AdminDashboard = ({ onLogout }) => {
   const subjectOptions = Array.from(new Set(tutors.flatMap(t => t.expertise)));
   const timeOptions = ['9:00 AM','11:00 AM','2:00 PM','4:00 PM'];
 
-  const openCreateSchedule = () => {
-    setCreateScheduleForm({ tutorId: '', room: 'Room A', selectedStudentIds: [], subjectsTimes: [ { subject: '', time: '9:00 AM' } ] });
+  // open Create Schedule modal; optionally prefill room and time when called from an Assign button
+  const openCreateSchedule = (room = 'Room A', time = '9:00 AM') => {
+    setCreateScheduleForm({ tutorId: '', room: room || 'Room A', selectedStudentIds: [], subjectsTimes: [ { subject: '', time: time || '9:00 AM' } ] });
     setShowCreateScheduleModal(true);
   };
 
@@ -152,6 +153,16 @@ const AdminDashboard = ({ onLogout }) => {
 
     setScheduleSlots(updatedSlots);
     setShowCreateScheduleModal(false);
+    // switch to Schedule tab so the user sees the newly created entry immediately
+    setActiveTab('schedule');
+  };
+
+  // Clear a schedule entry for a given time and room (roomKey: 'roomA'|'roomB'|'roomC')
+  const clearScheduleEntry = (time, roomKey) => {
+    setScheduleSlots(prev => prev.map(slot => {
+      if (slot.time !== time) return slot;
+      return { ...slot, [roomKey]: null };
+    }));
   };
 
   const [selectedEnrollment, setSelectedEnrollment] = useState(null);
@@ -1037,14 +1048,14 @@ const AdminDashboard = ({ onLogout }) => {
                         <div className="text-sm text-neutral-600">Tutor: {slot.roomA.tutor}</div>
                         <div className="flex gap-2 mt-2">
                           <button className="bg-yellow-400 text-white px-3 py-1 rounded">Edit</button>
-                          <button className="bg-pink-200 text-pink-700 px-3 py-1 rounded">Clear</button>
+                          <button onClick={() => clearScheduleEntry(slot.time, 'roomA')} className="bg-pink-200 text-pink-700 px-3 py-1 rounded">Clear</button>
                         </div>
                       </div>
-                    ) : (
+                      ) : (
                       <div>
                         <div className="text-neutral-500">— Unassigned —</div>
                         <div className="mt-2">
-                          <button className="bg-yellow-400 text-white px-3 py-1 rounded">Assign</button>
+                          <button onClick={() => openCreateSchedule('Room A', slot.time)} className="bg-yellow-400 text-white px-3 py-1 rounded">Assign</button>
                         </div>
                       </div>
                     )}
@@ -1056,7 +1067,7 @@ const AdminDashboard = ({ onLogout }) => {
                         <div className="text-sm text-neutral-600">Tutor: {slot.roomB.tutor}</div>
                       </div>
                     ) : (
-                      <div className="text-neutral-500">— Unassigned —<div className="mt-2"><button className="bg-yellow-400 text-white px-3 py-1 rounded">Assign</button></div></div>
+                      <div className="text-neutral-500">— Unassigned —<div className="mt-2"><button onClick={() => openCreateSchedule('Room B', slot.time)} className="bg-yellow-400 text-white px-3 py-1 rounded">Assign</button></div></div>
                     )}
                   </td>
                   <td className="py-4 px-4">
@@ -1066,7 +1077,7 @@ const AdminDashboard = ({ onLogout }) => {
                         <div className="text-sm text-neutral-600">Tutor: {slot.roomC.tutor}</div>
                       </div>
                     ) : (
-                      <div className="text-neutral-500">— Unassigned —<div className="mt-2"><button className="bg-yellow-400 text-white px-3 py-1 rounded">Assign</button></div></div>
+                      <div className="text-neutral-500">— Unassigned —<div className="mt-2"><button onClick={() => openCreateSchedule('Room C', slot.time)} className="bg-yellow-400 text-white px-3 py-1 rounded">Assign</button></div></div>
                     )}
                   </td>
                 </tr>
@@ -1260,8 +1271,8 @@ const AdminDashboard = ({ onLogout }) => {
                   </div>
                   <div className="flex items-center justify-between p-4 bg-neutral-50 rounded-xl">
                     <div>
-                      <div className="font-semibold text-neutral-900">Deleted Accounts</div>
-                      <div className="text-sm text-neutral-600">View recently deleted user accounts and restore if necessary</div>
+                      <div className="font-semibold text-neutral-900">Rejected accounts</div>
+                      <div className="text-sm text-neutral-600">View recently rejected user accounts and restore if necessary</div>
                     </div>
                     <button className="text-red-600 hover:text-red-700 font-semibold text-sm">View</button>
                   </div>
